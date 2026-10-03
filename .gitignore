@@ -1,0 +1,11 @@
+# 클론된 서피스 레포는 제외 (3.4GB)
+repos/
+
+# 로컬 에이전트 상태
+.omo/
+.codegraph
+.opencode/
+
+# OS/편집기
+.DS_Store
+*.swp
