@@ -1,7 +1,25 @@
 # AI 코딩 하니스 비교 분석
 
-대상: opencode, oh-my-openagent(OmO, omo-native 포함), pi-mono, oh-my-pi, codex, claude-code, openclaw, hermes-agent
-클론 위치: `/home/minkoo/study/repos/`
+8종의 AI 코딩 하니스 내부 구현을 **하니스별**·**주제별** 두 축으로 교차 분석한 문서 저장소.
+
+| | |
+|---|---|
+| **대상 하니스** | opencode, oh-my-openagent(OmO, omo-native 포함), pi-mono, oh-my-pi, codex, claude-code, openclaw, hermes-agent |
+| **문서** | 29개 (하니스 8 + 토픽 21) |
+| **원본** | 55개 레포 정적 분석 — `repos/`에 클론(로컬 전용, git 제외) |
+
+## 구조
+
+```
+├── topics/       # 주제별 교차 비교 (21개)
+├── harnesses/    # 하니스별 상세 분석 (8개)
+└── repos/        # 원본 클론 (git 미추적)
+```
+
+- `topics/` — "메모리는 8개 하니스가 각각 어떻게 다른가"
+- `harnesses/` — "opencode는 내부적으로 어떻게 동작하는가" (구체적 파일 경로 포함)
+
+**읽는 순서**: 아래 [한눈에 보기](한눈에-보기)로 좁혀넣고 → `topics/` 3~4개 → 필요 시 `harnesses/` 문서
 
 ## 문서 목록
 
@@ -56,3 +74,11 @@
 | claude-code | MEMORY.md 자동 | 바이너리 내장 | 없음(claude.ai 커넥터) | ~25 | 5종 + teams | 32 클래식 + ~90 function |
 | openclaw | Dreaming + SQLite | 48개 | 없음 | 66개 | harness 5 + swarm | 3종(~40 typed) |
 | hermes-agent | frozen-snapshot + 5 provider | 58개 + 152 optional | 없음(65 recipe) | 41 toolset | delegate + kanban | 4종(~50) |
+
+> 위 표는 **1차 스냅샷**이다. 8개 하니스 모두 주간 릴리스라 수치가 빠르게 바뀌며, 정확한 값은 각 `topics/` 문서를 본다.
+
+## 읽을 때 주의
+
+- **claude-code는 소스가 공개되지 않는다.** 레포에는 플러그인 13개·타입 선언(13,186줄)·CHANGELOG만 있어 내부 동작을 직접 읽을 수 없다. 기능 확인의 유일한 1차 출처는 `CHANGELOG.md`다.
+- **정확한 수치는 `topics/` 문서에 있다.** 특히 편집 방식은 [code-editing](topics/code-editing.md), 메모리는 [memory](topics/memory.md), 연속 실행은 [orchestration](topics/orchestration.md)를 보라.
+- **인용된 파일 경로는 대개 실재하지만 자동 검증 결과가 아닐 수 있다.** 중요한 인용은 `repos/` 원문과 대조하는 걸 권한다(작성 중 다른 하니스의 경로가 잘못 기입된 사례가 있음).
