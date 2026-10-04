@@ -301,6 +301,133 @@ Kibitzer, a background memory advisor, surfaced this stored note. It may or may 
 
 `src/locks/recall-wake-domain.ts`가 깨어 있는 사이드카 수를 제한한다: `RECALL_WAKE_DEFAULT_SLOTS = 2`, `RecallWakeBusyError`, 티켓 디렉터리 + `withRecallWakeLease`. 원장(`src/recall/ledger.ts`)은 세션별 surfaced path와 디스크 읽기 횟수(`recallLedgerDiskReads`)를 기록한다.
 
+
+### 3-6 검색 계층 전체 — 직접 만든 인덱스, 그리고 한국어
+
+앞 절들이 BM25와 게이트를 다뤘으니, 여기서는 **검색 계층 전체를 하나의 흐름으로** 정리한다. 핵심 질문에 대한 답은 한 문장이다.
+
+> **memory-core는 SQLite를 쓰지 않는다. 의존성 0개이고, 인덱스부터 스코어러까지 전부 직접 구현했다.**
+
+#### (a) 왜 SQLite FTS5가 아닌가
+
+`package.json`의 `dependencies`가 `{}`다. 그래서 물리적으로 FTS5를 쓸 수 없다. 저장 포맷부터 다른것도 이유다 — **git 백트레드 마크다운 파일**이다. 정렬 인덱스를 넣을 자리가 애초에 없다.
+
+| | OmO memory-core | openclaw | hermes-agent |
+|---|---|---|---|
+| 저장 | git 백트레드 마크다운 파일 | per-agent **SQLite** | SQLite `state.db` |
+| 검색 | **직접 구현 BM25 + FTS-lite** | **FTS5 BM25 + vector + hybrid**, MMR, CJK trigram | **FTS5 + trigram** |
+| 벡터 | 없음 | `sqlite-vec` (별도 read-only 프로세스) | 없음 |
+| 의존성 | **0** | SQLite + `sqlite-vec` 등 | SQLite |
+
+즉 검색 계층이 성숙한 쪽은 openclaw/hermes다. **OmO가 고른 건 성능이 아니라 일관성**이다 — 저장소가 git이고, 하이퍼 텍스트 의존성을 도입하면 그 git 중심 설계(§2의 트랜잭션·컴파일·컴밋-from-HEAD 불변식)와 어긋나기 때문에, 검색도 같은 원칙으로 짜지 않았다. 이 일관성은 `src/harness-neutrality.test.ts`라는 아키텍처 테스트로 강제된다.
+
+#### (b) 인덱스를 직접 만든다는 것의 의미
+
+`src/recall/bm25.ts`는 FTS5의 inverted index를 빌려오지 않는다. 코퍼스가 준비되면 이 구조를 직접 채운다.
+
+```ts
+interface RecallBm25Index {
+  readonly termFrequencies: readonly ReadonlyMap<string, number>[]  // 문서별 단어 빈도
+  readonly lengths: readonly number[]                              // 문서별 길이
+  readonly documentFrequency: ReadonlyMap<string, number>          // 전역 문서 빈도
+}
+```
+
+즉 **문서 × 단어 빈도 행렬을 통째로 메모리에 들고 있습니다.** 랭킹은 이 배열을 순회해 계산합니다.
+
+```ts
+const K1 = 1.5, B = 0.75
+const idf = Math.log(1 + (N - df + 0.5) / (df + 0.5))
+return (idf * tf * (K1 + 1)) / (tf + K1 * (1 - B + (B * length) / averageLength))
+```
+
+표준 Okapi BM25를 그대로 옮긴 식입니다. `length` 계산에서 **독립 한자 개수를 빼는 것**이 목적어 중복 계산을 막습니다.
+
+비용도 트레이드오프입니다. 이 인덱스는 `WeakMap`으로 문서 배열에 캐싱되고(`§3-1`), 코퍼스 revision마다 새로 만들어집니다. 수만 건 규모에서 inverted index 대비 메모리足迹이 크지만, 그 대신 "무엇을 색인했는가"가 완전히 투명해져 `Compile-from-committed` 불변식을 지킬 수 있습니다.
+
+#### (c) 세 가지 랭커와 그 관계
+
+코퍼스에는 랭커가 하나가 아닙니다. `strategy.ts`가 조건에 따라 고릅니다.
+
+```
+   ┌─ substring ─ FTS-lite 부분 문자열 AND 스코어러 (search/query.ts)
+   │               · 모든 term·phrase가 부분 문자열로 맞아야 통과 (AND)
+   │               · score = Σ term(첫 등장 위치 + max(0, 50 - 길이))
+   │                        + Σ phrase(0.1 × 첫 등장 위치)
+   │               · 검색창 끝단 매칭의 합이라 **짧은 단어가 불리**
+   │
+   ├─ bm25 ────── 자체 구현 Okapi BM25 + CJK 바이그램 (recall/bm25.ts)
+   │               · OR 스코어 + idf 가중 → 희귀어가 흔한어보다 위로
+   │
+   └─ hybrid ──── 둘을 reciprocal rank fusion으로 융합 (recall/select.ts)
+                   · RRF_K = 60 (Cormack et al. 관례값)
+                   · score = 1 / (1 + 1 / (60 + rank + 1))
+```
+
+`substring`이 남아 있는 이유가 있습니다. 주석이 설계 의도를 말합니다 — "**영문 전용 사용자에게는 예전에 보던 후보를 정확히 그대로 보여주기 위해** 유지했다." 하위 호환성이지, 게으름이 아닙니다.
+
+`query.ts`는 여기서 두 번째 상용프로젝트의 차용점도 명시합니다: *"Exact port of `letta-code` `src/backend/local/transcript-search.ts:167-292`... 스코어링 공식을 의도적으로 그대로 재현해 로컬 검색 랭킹이 letta와 동일하게 유지된다."*
+
+#### (d) 한국어 처리가 설계의 중심인 이유
+
+`strategy.ts`의 판단 기준이 이것입니다.
+
+> "부분 문자열 AND 매칭은 **굴절된 한국어와 띄어쓰기 없는 일본어·중국어를 완전히 놓칩니다.**"
+
+한국어는 어절이 띄어쓰기로 분리되지 않으므로, 공백 단위 AND 매칭은 한국어에서 근본적으로 깨집니다. 그래서 임계값이 두 개 있습니다.
+
+- `CJK_CORPUS_MIN_SHARE = 0.1` — 전체 문자 중 CJK 비율이 10% 이상
+- `LARGE_CORPUS_MIN_DOCUMENTS = 200` — 이 이상이면 hybrid로 승격
+
+둘 다 실측 기반입니다. `packages/omo-senpi/scripts/qa`의 `recall-ranker-bench.mjs`에서 나왔습니다.
+
+#### (e) 토크나이저 규칙과 실전 예시
+
+CJK 런을 **문자 바이그램**으로 쪼갭니다. 형태소 분석기를 쓰지 않는 게 핵심입니다.
+
+```ts
+const CJK_CLASS = "\p{Script=Hangul}\p{Script=Han}\p{Script=Hiragana}\p{Script=Katakana}\u30fc"
+const TOKEN_PATTERN = new RegExp(`[${CJK_CLASS}]+|(?:(?![${CJK_CLASS}])[\p{L}\p{M}\p{N}])+`, "gu")
+```
+
+`한국어`를 넣으면 이렇게 풀립니다.
+
+```
+입력  한국어
+      ├── 한      (독립 term — 홑 한글은 단독으로 추가하지 않음)
+      ├── 국      (동일)
+      └── 한국, 국어   (바이그램 — 그래서 '한국어'가 '한국'과 겹친다)
+```
+
+규칙 5개는 `§3-3`에 있습니다. 여기서 핵심만 짚으면:
+
+| 규칙 | 이유 |
+|---|---|
+| CJK 런 > 2자 → 문자 바이그램 추가 | 굴절된 한국어가 저장된 어간과 접두사를 공유하면 매칭된다 |
+| **한자 문자는 독립 term** | 중국어 단어·일본어 한자어는 자주 한 글자. 바이그램으로는 그걸 고립시킬 수 없다 |
+| 홑 한글·홀 가나는 독립 term 안 만듦 | 그러면 더 긴 단어와 절대 매치되지 않는 왜곡이 생긴다 |
+| 영어는 별도 stemming | `english-stem.ts` |
+| NFKC 정규화 + 소문자 | NFD 한글(macOS 파일명 유래)과 전각 라틴을 한 형태에서 만나게 함 |
+
+`U+30FC`(카타카나-히라가나 장음)가 `Script=Common`이라 Kana 런에 자동 포함되지 않는 **유니코드 함정**까지 명시적으로 처리한 흔적도 있습니다.
+
+쿼리 확장 가중치 `{ synonyms: 0.75, keywords: 0.75, related: 0.4, noteLine: 0.4 }`도 실측 출처가 있습니다 — birkin-mnemosyne 검색 벤치마크 dev split. 그리고 안전장치 하나: **쿼리의 모든 unit을 다 잡은 문서는 확장 점수를 받지 않고 `fullMatch: true`로 맨 앞에 올라갑니다.** 확장은 순위를 뒤집지 않습니다.
+
+#### (f) 조달한 것과 만든 것의 경계
+
+솔직하게 구분하면 이렇습니다.
+
+| | 출처 | 성격 |
+|---|---|---|
+| BM25 **알고리즘** | birkin-mnemosyne | 차용·적용(한국어 바이그램 대응) |
+| 확장 가중치 **수치** | birkin-mnemosyne 벤치마크 dev split | 계측값 |
+| FTS-lite 스코어러 | letta-code `transcript-search.ts` | 정확한 포팅 |
+| 임계값 2개 | `recall-ranker-bench.mjs` | 계측값 |
+| 인덱스 자료구조·idf/tf 계산·토크나이저·전략 선택·게이트 | 자체 | 직접 구현 |
+
+알고리즘과 스코어링 공식은 이름을 밝혀 차용했고, **인덱스를 저장하고 스코어를 계산하고 스트래티지를 고르고 게이트로 오염을 막는 코드는 전부 이 레포에 있습니다.**
+
+
 ---
 
 ## 4. Reflection — 반사 상태머신

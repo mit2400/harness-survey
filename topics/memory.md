@@ -2,10 +2,12 @@
 
 ## 요약
 
+> **OmO 검색 계층 참고**: sqlite·FTS5를 쓰지 않고 의존성 0개로 BM25를 직접 구현했다는 점이 다른 하니스와 대비됩니다. 자세한 메커니즘과한국어 처리 규칙은 [`harnesses/oh-my-openagent/03-memory.md`](../harnesses/oh-my-openagent/03-memory.md) §3-6을 보세요.
+
 | 하니스 | 영구 메모리 | 세션 저장 | Compaction | 컨텍스트 파일 |
 |---|---|---|---|---|
 | opencode | 없음 (서드파티 플러그인만) | SQLite `opencode-<channel>.db` | V1/V2 양쪽, prune 20k/40k | AGENTS.md/CLAUDE.md/CONTEXT.md walk-up |
-| oh-my-openagent | **git-backed MemFS + Kibitzer** | OpenCode 세션 상속 | 3중 방어(context injector/todo preserver/preemptive) | AGENTS.md walk-up + rules-engine |
+| **oh-my-openagent** | **git MemFS + 자체구현 BM25** (의존성 0, SQLite 미사용) | OpenCode 세션 상속 | 3중 방어(context injector/todo preserver/preemptive) | AGENTS.md walk-up + rules-engine |
 | pi-mono | 없음 | JSONL 트리 `~/.pi/agent/sessions/` | contiguity-aware (tool call/result 사이 안 자름) | AGENTS.md > CLAUDE.md ancestor walk |
 | oh-my-pi | **5 백엔드** (off/local/hindsight/mnemopi/sharpshooter) | JSONL `~/.omp/agent/sessions/` | **5 메서드** (remote/snapcompact/handoff/shake/soft) | 18개 discovery provider, `.omp/AGENTS.md` 최우선 |
 | codex | **2-phase 파이프라인** (기본 off) | JSONL rollout + SQLite state DB | remote V2 + 로컬, checkpoint | AGENTS.md + AGENTS.override.md |
@@ -21,15 +23,50 @@
 - System Context algebra: `packages/core/src/system-context/` (env, date 블록 diff 주입)
 
 ## oh-my-openagent (OmO)
-가장 독보적인 메모리 시스템.
-- **memory-core** (`packages/memory-core/`): git-backed markdown MemFS. YAML frontmatter 필수, 트랜잭션 쓰기(lock→clean repo→validate→commit)
+가장 독보적인 메모리 시스템. **상세가 [`harnesses/oh-my-openagent/03-memory.md`](../harnesses/oh-my-openagent/03-memory.md)에 835줄로 다룬다.**
+
+### 저장: git MemFS
+- **memory-core** (`packages/memory-core/`, 230 ts / 33,607 LoC): git 백트레드 마크다운 메모리 FS. YAML frontmatter 필수, 트랜잭션 쓰기(lock → clean repo → validate → commit)
   - 툴: `memory` (create/str_replace/insert/delete/rename), `memory_apply_patch`
-  - **Kibitzer**: 작은 모델이 BM25 recall로 메인 에이전트 옆에서 넛지 (`recall/bm25.ts`, `recall/gate.ts` nudge-only 모드)
-  - **Reflection**: 상태머신, worktree 실행, orphan sweep, park policy (반복 실패 시 자동 중단)
-  - 서브엔진: Soul(identity watermark), Facts(durable queue), People(카드), Dream(idle 통합), Compile(커밋된 메모리→시스템 프롬프트 블록)
-- Compaction 방어: `compaction-context-injector`, `compaction-todo-preserver`, `preemptive-compaction` 훅
+  - 서브엔진 11종: Soul(identity watermark), Facts(durable queue), People(카드), Dream(idle 통합), **Compile(커밋된 메모리 → 시스템 프롬프트 블록)**, Search, Sync, Journal, Locks, Seeds
+  - 불변식 **Compile-from-committed**: HEAD 커밋 트리만 통과. 워킹 트리를 절대 참조하지 않음 → 미커밋 편집이 리콜에 새어들 수 없음
+  - 프로세스 예산: `ls-tree` **1회 + `cat-file --batch` 최대 1회**
+
+### 검색: SQLite를 쓰지 않고 직접 구현 ← 핵심
+`package.json`의 `dependencies`가 **`{}`(0개)**. 저장 포맷이 git 마크다운이므로 정렬 인덱스를 넣을 자리도 없습니다.
+
+| | OmO | openclaw | hermes-agent |
+|---|---|---|---|
+| 저장 | git 백트레드 마크다운 | per-agent **SQLite** | SQLite `state.db` |
+| 검색 | **자체 BM25 + FTS-lite** | **FTS5 BM25 + vector + hybrid**, MMR, CJK trigram | **FTS5 + trigram** |
+| 벡터 | 없음 | `sqlite-vec` (별도 read-only 프로세스) | 없음 |
+
+성숙도로는 openclaw/hermes가 앞섭니다. **OmO는 성능이 아니라 일관성을 고른 것** — git 중심 설계에 하이퍼 텍스트 의존성을 넣지 않고, 검색도 같은 원칙으로 직접 짰습니다(`src/harness-neutrality.test.ts`가 강제).
+
+- **직접 만든 인덱스**: FTS5의 inverted index 대신 `termFrequencies: Map[]` + `lengths[]` + `documentFrequency: Map`를 들고 직접 랭킹. Okapi BM25 공식을 그대로 구현 (`K1=1.5`, `B=0.75`)
+- **3개 랭커 자동 선택** (`strategy.ts`):
+  - `substring` — FTS-lite AND 스코어러. **영문 전용 사용자에게 예전 결과를 그대로 유지**하려는 하위 호환성
+  - `bm25` — 쿼리에 CJK 있거나 코퍼스 CJK 비중 ≥ **0.1** (글자 코드포인트 기준)
+  - `hybrid` — 문서 수 ≥ **200**이면 우선. reciprocal rank fusion, `RRF_K = 60`
+  - 두 임계값 모두 `recall-ranker-bench.mjs`에서 **계측**됨
+- **한국어 처리**: 공백 AND 매칭은 한국어를 근본적으로 놓치므로(어절이 띄어쓰기로 분리되지 않음) CJK 런을 **문자 바이그램**으로 토크나이즈. 형태소 분석기 미사용. 한자 문자는 독립 term(중국어·일본어에서 한 글자가 단어인 경우), 홑 한글·가나는 독립 term 안 만듦. 영어는 별도 stemming
+- **오염 방지**: 리트리버는 넓게, Kibitzer judge가 정밀도 유지. 결과는 **직접 주입이 아니라 nudge** — 게이트가 `에이전트를 향해 말하는 형태`를 입장 시점에 거부
+
+### Compaction 방어
+`compaction-context-injector` / `compaction-todo-preserver` / `preemptive-compaction` 훅 (memory-core 밖, omo-opencode에 위치)
+
+### 그 외
 - 세션 툴: `session_list/read/search/info` (OpenCode가 숨기는 세션 탐색)
 - AGENTS.md: `agents-md-core` walk-up + `rules-engine` (`.omo/rules`, `.claude/rules`, `.cursor/rules`, `.github/instructions`)
+
+### 조달 vs 자체 구현 (솔직한 경계)
+| | 출처 | 성격 |
+|---|---|---|
+| BM25 알고리즘 | birkin-mnemosyne | 차용·적용 |
+| 확장 가중치 수치 | birkin-mnemosyne 벤치마크 dev split | 계측값 |
+| FTS-lite 스코어러 | letta-code `transcript-search.ts` | 정확한 포팅 |
+| 임계값 2개 | `recall-ranker-bench.mjs` | 계측값 |
+| 인덱스·idf/tf 계산·토크나이저·전략 선택·게이트 | 자체 | **직접 구현** |
 
 ## pi-mono
 - 메모리 툴 없음. 세션 JSONL 트리 (`id`/`parentId`, v3), `/tree` `/fork` `/clone`

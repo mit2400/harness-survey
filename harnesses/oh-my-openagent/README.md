@@ -21,7 +21,7 @@
 |---|---|
 | [01-architecture.md](01-architecture.md) | 50개 패키지 맵, 공용 core 18개와 4개 어댑터의 관계, 부트 플로우, 패키지 의존 그래프 |
 | [02-targets.md](02-targets.md) | `omo-opencode` / `omo-codex` / `omo-senpi` / `omo-native` 이 실제로 무엇이 다른가 — 이름이 같은 것을 착각하지 말 것 |
-| [03-memory.md](03-memory.md) | `memory-core` + Kibitzer BM25 recall + Reflection 상태머신 — **공식 문서 미문서화 구간** |
+| [03-memory.md](03-memory.md) | `memory-core` + Kibitzer BM25 recall + Reflection 상태머신 — **공식 문서 미문서화 구간** | 검색 계층(자체구현 BM25·한국어 바이그램·nudge 게이트) 상세 포함.
 | [04-orchestration.md](04-orchestration.md) | `senpi-task` DAG 엔진 + `boulder-state` + ulw/goal 루프가 어떻게 결속되는가 |
 | [05-hooks-rules.md](05-hooks-rules.md) | 5-tier 훅 시스템, `rules-engine`, AGENTS.md 주입 경로 |
 | [06-skills-mcp-tools.md](06-skills-mcp-tools.md) | 7-source 스킬 발견, 3-tier MCP, hashline edit, LSP 경로 |
