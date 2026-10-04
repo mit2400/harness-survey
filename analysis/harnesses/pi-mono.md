@@ -7,21 +7,22 @@ Mario Zechner의 pi coding agent. Bun+TypeScript 모노레포 13 패키지. "강
 
 ## 디렉토리 구조
 ```
-packages/
-├── coding-agent/      # CLI (메인)
-├── agent-core/        # 에이전트 루프
-├── pi-ai/             # 멀티프로바이더 LLM API
-├── pi-tui/            # 터미널 UI
-├── pi-durable/        # durable 런타임 (SQLite)
-├── pi-mcp/            # MCP
-├── pi-codemode/       # codemode
-├── pi-protocol/       # 프로토콜
-├── pi-client/         # 클라이언트
-├── pi-server/         # 서버
-├── pi-evals/          # evals
-├── chord/             # 앱 컴포지션
-└── pi-telemetry/      # 텔레메트리
+packages/            # 13 패키지 (디렉터리명 = 짧은 이름, npm 패키지명 = @earendil-works/pi-*)
+├── coding-agent/     # CLI (메인)
+├── agent/            # 에이전트 루프 (pkg: pi-agent)
+├── ai/               # 멀티프로바이더 LLM API (pkg: pi-ai)
+├── tui/              # 터미널 UI (pi-tui)
+├── durable/          # durable 런타임 (pi-durable)
+├── mcp/              # MCP (pi-mcp)
+├── codemode/         # QuickJS 샌드박스 (pi-codemode)
+├── protocol/         # CBOR 프로토콜 (pi-protocol)
+├── client/           # 클라이언트 (pi-client)
+├── server/           # 서버 (pi-server)
+├── evals/            # evals (pi-evals)
+├── chord/            # 앱 컴포지션
+└── telemetry/        # 텔레메트리
 ```
+> 참고: 소스 디렉터리명은 `tui/`, `client/` 등 짧은 형태이고, `package.json`의 이름은 `@earendil-works/pi-tui`, `@earendil-works/pi-client` … 이다.
 
 ## 메모리 관리
 - 메모리 툴 없음
