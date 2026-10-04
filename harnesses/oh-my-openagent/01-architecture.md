@@ -17,9 +17,9 @@ LoC는 **테스트 파일 제외 `src/` 기준**이다(아래 표의 수치는 �
 | 패키지 | LoC | 역할 | 분류 |
 |---|---:|---|---|
 | `packages/omo-opencode/` | **126,239** | OpenCode Ultimate 에디션. 루트 npm dist(`dist/index.js`)의 **빌드 엔트리** | 어댑터 |
-| `packages/omo-senpi/` | **76,079** | Senpi 네이티브 TypeScript 확장 어댑터 (`packages/omo-senpi/plugin/` 로컬-path Pi 패키지) | 어댑터 |
+| `packages/omo-senpi/` | **122,133** | Senpi 네이티브 TypeScript 확장 어댑터 (`packages/omo-senpi/plugin/` 로컬-path Pi 패키지) | 어댑터 |
 | `packages/omo-codex/` | **8,237** | Codex CLI Light 에디션. npm alias `lazycodex-ai`, 저장소/bin 아이덴티티 `lazycodex` | 어댑터 |
-| `packages/omo-native/` | 0 | `omo-ai` 배포 런처. `omo-senpi` 플러그인 페이로드를 스테이징만 하는 셸 | 어댑터(런처) |
+| `packages/omo-native/` | 2,633 | `omo-ai` 배포 런처(npm bin `omo`). 유일한 의존성은 외부 `@code-yeongyu/senpi`. `omo-senpi` 플러그인 페이로드를 스테이징하고 supervision — 엔진 자체는 아님 | 어댑터(런처) |
 
 ### 1.2 공유 코어 (`*-core`, 18개)
 

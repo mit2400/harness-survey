@@ -27,6 +27,8 @@
 | [06-skills-mcp-tools.md](06-skills-mcp-tools.md) | 7-source 스킬 발견, 3-tier MCP, hashline edit, LSP 경로 |
 | [07-config-distribution.md](07-config-distribution.md) | 설정 해석(profiles/migration/doctor) + 12개 플랫폼 바이너리 배포 체계 |
 | [08-upstream-docs-map.md](08-upstream-docs-map.md) | 공식 문서 45개 인덱스 + **공식 문서에 없는 것** 목록 |
+| [09-native-runtime.md](09-native-runtime.md) | **OmO Native를 하니스로** — 런처(2.6k)/엔진(122k) 경계, compile·supervisor 생명주기, doctor 4종, bunshin 능력 설치 모델 |
+| [10-vision-computer-use.md](10-vision-computer-use.md) | `look_at`(툴) vs `multimodal-looker`(에이전트) 3층 분리 + 비전 모델 폴백 체인 + `computer` 안전 모델(2티어 권한·스톕 차드·감사 로그) |
 
 ## 읽는 순서
 
@@ -50,6 +52,8 @@ LoC가 큰 `omo-opencode`(126,239) / `omo-senpi`(76,079) / `senpi-task`(53,551) 
 |---|---|
 | [03-memory.md](03-memory.md) | `grep docs/` 결과 **`memory-core` 언급 0회**. 14,784줄짜리 메모리 엔진(Kibitzer BM25, Reflection 상태머신, Soul/Facts/People/Dream 서브엔진, worktree 실행, orphan sweep)이 전부 미문서화. 실제로 읽어야만 다룰 수 있는 부분 |
 | [08-upstream-docs-map.md](08-upstream-docs-map.md) | 공식 45개 문서의 어디에 무엇이 있는지와 **어디가 비어 있는지**를 한 장에서 정리. 문서 커버리지 갭을 먼저 알고 읽어야 중복 시간을 안 쓴다 |
+| [09-native-runtime.md](09-native-runtime.md) | Native를 고른 이유와 런처/엔진 경계. 컴퓨터 유즈처럼 **플러그인에서는 구조적으로 불가능한 기능**을 왜 native에서만 가능한지 |
+| [10-vision-computer-use.md](10-vision-computer-use.md) | 비전/컴퓨터 유즈 실전 동작. `look_at` 7단계 실행 흐름, 왜 이미지를 서브세션으로 위임하는지, 스톕 차드가 왜 "중단 불가능한 실행"을 refuses하는지 |
 
 추정 커버리지 갭(문서 내 언급 횟수 기준): `memory-core` 0, `isolation-core` 0, `kibitzer` 1, `boulder-state` 2, `senpi-task` 10, `omo-senpi` 13. 즉 대용량 서브시스템일수록 공식 문서 언급이 적다 — 밀도가 아니라 존재 이유로 문서가 배분된 듯하다.
 

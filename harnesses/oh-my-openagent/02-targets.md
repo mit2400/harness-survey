@@ -8,9 +8,9 @@
 | 패키지 | npm 이름 | 실체 | src LoC |
 |---|---|---|---|
 | `packages/omo-opencode/` | `@oh-my-opencode/omo-opencode` (private) | OpenCode **플러그인** (`PluginModule`) | 126,239 |
-| `packages/omo-senpi/` | `@oh-my-opencode/omo-senpi` (private) | **Senpi 네이티브 확장**(TypeScript Extension) | 76,079 |
+| `packages/omo-senpi/` | `@oh-my-opencode/omo-senpi` (private) | **Senpi 네이티브 확장**(TypeScript Extension) | 122,133 |
 | `packages/omo-codex/` | `@oh-my-opencode/omo-codex` (private) | Codex **설치러 + 벤더링된 플러그인 namespace** | 8,237 |
-| `packages/omo-native/` | **`omo-ai`** (공개, bin `omo`) | 위 Senpi 플러그인을 **구동하는 런처** | 0 |
+| `packages/omo-native/` | **`omo-ai`** (공개, bin `omo`) | 위 Senpi 플러그인을 **구동하는 런처** | 2,633 |
 
 `docs/guide/installation.md`가 이 구분을 "**three editions** of the same product: two plugins that load into a host you already run, plus one standalone edition"로 규정한다. 즉 **플러그인 2개(Ultimate/Light) + 스탠드얼론 1개(Native)**.
 
@@ -76,10 +76,11 @@ export * from "./install"
 - 배포: `npx lazycodex-ai install` → `~/.codex/plugins/cache/sisyphuslabs/omo/<version>/` + `~/.codex/config.toml`에 `omo@sisyphuslabs` 활성화 + `~/.codex/agents/`에 agent TOML 12개.
 - `omo-codex/README.md`가 OpenCode 타깃을 직접 명시: "The Codex plugin bundle includes Context7 as a default MCP in its `.mcp.json` … The same plugin-scoped MCP manifest also bundles `grep_app`, `git_bash`, and `lsp`."
 
-### `omo-native` — Senpi를 띄우는 런처 (src LoC 0)
+### `omo-native` — Senpi를 띄우는 런처/슈퍼바이저 (2,633 LoC)
 
 - `package.json`: `name: "omo-ai"`, `bin: { omo: "bin/omo.js" }`, description "OmO Native - the standalone omo command with the OMO extension built in: bun add -g omo-ai", **의존성 1개** = `@code-yeongyu/senpi@2026.10.3`.
-- `src/` 디렉터리가 없다. `build-info.ts`, `compile-entry.ts`, `category-coverage-entry.ts`, `claude-code-doctor.ts` 같은 TS 파일은 전부 패키지 최상위에 있고, `bun run build:omo-native`(`script/build-omo-native.ts`)이 `bin/lib/` 런타임으로 번들하는 **스테이징 진입점 shim**이다. 그래서 src LoC가 0이다.
+- `src/` 디렉터리가 **없기 때문에** `src/` 기준 측정값이 0으로 잘못 나올 수 있다. 실제로는 패키지 최상위에 `build-info.ts`, `compile-entry.ts`, `compile-runtime.ts`, `supervisor-fast-path.ts`, `computer-use-engine-probe.ts`, `computer-use-doctor-runtime.ts` 등 **27개 파일 / 2,633 LoC**가 있다. `bun run build:omo-native`(`script/build-omo-native.ts`)이 이들을 `bin/lib/` 런타임으로 번들한다.
+- 상세는 [09-native-runtime.md](09-native-runtime.md) 참고.
 - `bin/omo.js` 본체:
 
 ```js
