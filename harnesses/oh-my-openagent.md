@@ -3,6 +3,8 @@
 > OmO: Just type "mass ulw" keyword with your prompt. (`code-yeongyu/oh-my-openagent`, 69k stars)
 > omo-native는 이 레포 안의 어댑터 (`packages/omo-native/`)
 > **분석 기준**: `code-yeongyu/oh-my-openagent` · 커밋 `251cbfe` (2026-10-04) · 버전 `5.1.13` — 전체 목록은 [VERSIONS.md](../VERSIONS.md)
+>
+> 🔬 **심층 문서 존재** — OmO는 공식 문서가 45개·10,882줄로 이 서베이 전체의 3배 규모입니다. 위 문서는 8개 하니스 **대등 비교**용이고, 공식 문서가 다루지 않는 내부 구현(.memory-core는 공식 문서 언급 0건)은 별도로 파고들었습니다 → **[딥다이브 9개 문서](oh-my-openagent/README.md)**
 
 ## 개요
 **50개 디렉터리** 모노레포(플랫폼 바이너리 12개 제외 시 38개). 구성: 공유 core 18개 + MCP 5개 + **어댑터 4개**(`omo-opencode`/`omo-codex`/`omo-senpi`/`omo-native`) + senpi-desktop 5개 + `senpi-task`·`boulder-state`·`rules-engine`·`lsp-daemon`·`shared-skills`·`utils`·`web`·`get-worker` + **플랫폼 바이너리 12개**(darwin/linux/windows × arm64/x64/x64-baseline/musl). Bun 1.4.0 + Rust crates(senpi-desktop computer-use).

@@ -5,7 +5,7 @@
 | | |
 |---|---|
 | **대상 하니스** | opencode, oh-my-openagent(OmO, omo-native 포함), pi-mono, oh-my-pi, codex, claude-code, openclaw, hermes-agent |
-| **문서** | 29개 (하니스 8 + 토픽 21) |
+| **문서** | 38개 (하니스 8 + 하니스 심층 9 + 토픽 21) |
 | **원본** | 55개 레포 정적 분석 — `repos/`에 클론(로컬 전용, git 제외) |
 | **분석 기준 버전** | [VERSIONS.md](VERSIONS.md) — 2026-10-05 수집, 커밋 고정 |
 
@@ -16,6 +16,7 @@
 ```
 ├── topics/       # 주제별 교차 비교 (21개)
 ├── harnesses/    # 하니스별 상세 분석 (8개)
+│   └── oh-my-openagent/   # OmO 심층 분석 (9개) — 공식 문서 10,882줄의 빈틈 공략
 └── repos/        # 원본 클론 (git 미추적)
 ```
 
@@ -64,6 +65,12 @@
 | [harnesses/claude-code.md](harnesses/claude-code.md) | claude-code (anthropics/claude-code) |
 | [harnesses/openclaw.md](harnesses/openclaw.md) | openclaw |
 | [harnesses/hermes-agent.md](harnesses/hermes-agent.md) | hermes-agent (NousResearch) |
+
+### 하니스 심층 문서 (deep dive)
+
+| 하니스 | 문서 | 상태 |
+|---|---|---|
+| **oh-my-openagent** | [oh-my-openagent/](harnesses/oh-my-openagent/README.md) — 9개 문서 | 01 아키텍처 · 02 타깃 · 03 메모리 · 04 오케스트레이션 · 05 훅/룰 · 06 스킬/MCP/툴 · 07 설정/배포 · 08 업스트림 문서 지도 |
 
 ## 한눈에 보기
 
