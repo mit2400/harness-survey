@@ -18,8 +18,13 @@
 | [topics/config.md](topics/config.md) | 설정 파일 비교 |
 | [topics/unique-features.md](topics/unique-features.md) | 하니스별 독특한 기능 |
 | [topics/ecosystem.md](topics/ecosystem.md) | 스킬/MCP 생태계 서베이 (awesome 리스트 분석) |
+| [topics/code-editing.md](topics/code-editing.md) | 파일 편집 메커니즘 비교 (edit 방식, fuzzy 검증, undo/checkpoint) |
+| [topics/orchestration.md](topics/orchestration.md) | 워크플로/오케스트레이션 비교 (계획 모드, 루프, DAG, 상태 관리) |
+| [topics/model-management.md](topics/model-management.md) | 모델/프로바이더 관리 비교 (카탈로그, fallback, effort, 캐시) |
+| [topics/shell-exec.md](topics/shell-exec.md) | 셸 실행 비교 (백엔드, 출력 제한, 백그라운드, persistent kernel) |
 | [topics/vision-computer-use.md](topics/vision-computer-use.md) | 비전/이미지 툴, 브라우저 자동화, computer use 비교 |
 | [topics/sandbox.md](topics/sandbox.md) | 샌드박스/격리/권한 승인 시스템 비교 |
+| [topics/lsp-lint.md](topics/lsp-lint.md) | LSP/린트/정적분석 지원 비교 (LSP 제공 형태, diagnostics, AST 검색) |
 
 ### 하니스별 상세 문서 (`harnesses/`)
 
