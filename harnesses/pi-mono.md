@@ -1,6 +1,7 @@
 # pi-mono (pi.dev)
 
 > Pi ships with powerful defaults but skips features like sub-agents and plan mode. (`badlogic/pi-mono`)
+> **분석 기준**: `badlogic/pi-mono` · 커밋 `8369268` (2026-10-03) · 버전 `0.0.3` — 전체 목록은 [VERSIONS.md](../VERSIONS.md)
 
 ## 개요
 Mario Zechner의 pi coding agent. Bun+TypeScript 모노레포 13 패키지. "강력한 기본값 + 기능 최소화" 철학.

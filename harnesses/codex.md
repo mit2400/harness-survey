@@ -1,6 +1,7 @@
 # codex
 
 > Lightweight coding agent that runs in your terminal (`openai/codex`, 127k stars)
+> **분석 기준**: `openai/codex` · 커밋 `b741e48` (2026-10-03) · 버전 `0.0.0-dev` — 전체 목록은 [VERSIONS.md](../VERSIONS.md)
 
 ## 개요
 Rust 워크스페이스 (`codex-rs/`, ~122 crates) + 얇은 TS `codex-cli/` 래퍼.

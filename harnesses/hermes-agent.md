@@ -1,6 +1,7 @@
 # hermes-agent
 
 > The self-improving AI agent built by Nous Research. (`NousResearch/hermes-agent`, 251k stars)
+> **분석 기준**: `NousResearch/hermes-agent` · 커밋 `620ceb8` (2026-10-03) · 버전 `1.0.0` — 전체 목록은 [VERSIONS.md](../VERSIONS.md)
 
 ## 개요
 Python 모노레포 (`pyproject.toml`, `uv.lock`), 33개 톱레벨 디렉토리. **41 toolset, 번들 스킬 58개 + 옵셔널 152개**, 22개 플랫폼 어댑터를 단일 gateway 프로세스에서 구동. 내장 학습 루프(스킬 자동 생성/개선, FTS5 세션 검색, 주기적 nudge)가 차별점. 공식 문서는 `website/docs/` (getting-started, user-guide, guides, integrations, reference, developer-guide).

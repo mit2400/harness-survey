@@ -1,6 +1,7 @@
 # openclaw
 
 > The AI that really does things. Any OS. Any Platform. (`openclaw/openclaw`, 391k stars)
+> **분석 기준**: `openclaw/openclaw` · 커밋 `ee9127b7` (2026-10-04) · 버전 `2026.9.8` — 전체 목록은 [VERSIONS.md](../VERSIONS.md)
 
 ## 개요
 v2026.9.8, MIT. "Multi-channel AI gateway with extensible messaging integrations". TypeScript 모노레포 (`src/`, `packages/`, `apps/`, `crates/`, `extensions/`, `ui/`). **163 번들 플러그인 + 48 번들 스킬**.

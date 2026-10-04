@@ -2,6 +2,7 @@
 
 > Claude Code is an agentic coding tool that lives in your terminal (`anthropics/claude-code`, 149k stars)
 > **주의**: 이 레포는 CLI 소스가 아니라 공개 배포 레포 (plugins/mods/examples/CHANGELOG). 엔진은 컴파일된 네이티브 바이너리.
+> **분석 기준**: `anthropics/claude-code` · 커밋 `1c229fc` (2026-10-02) · 버전 `v2.1.288` — 전체 목록은 [VERSIONS.md](../VERSIONS.md)
 
 ## 개요
 공개 레포 구성: `plugins/`(13 번들 플러그인), `mods/`(바이너리 내장 TS 훅 모듈 4개), `examples/`(settings/mdm/hooks/gateway), `CHANGELOG.md`(900KB, 410 릴리스, 0.2.21→2.1.288), `.claude-plugin/marketplace.json`, `.github/workflows/`

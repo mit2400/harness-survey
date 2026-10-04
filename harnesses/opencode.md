@@ -1,6 +1,7 @@
 # opencode
 
 > The open source coding agent. (`anomalyco/opencode`, 211k stars)
+> **분석 기준**: `anomalyco/opencode` · 커밋 `907b3bc` (2026-10-02) · 버전 `1.18.34` — 전체 목록은 [VERSIONS.md](../VERSIONS.md)
 
 ## 개요
 모노레포, 33 패키지. V1(`packages/opencode/src/`)과 V2(`packages/core/src/`) 병행 구현. V2는 Effect-native, Location/Application 스코프 아키텍처.

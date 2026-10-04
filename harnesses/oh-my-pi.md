@@ -2,6 +2,7 @@
 
 > Coding agent with the IDE wired in. Built by Stencil Labs. (`can1357/oh-my-pi`, 34k stars)
 > pi-mono의 fork/확장
+> **분석 기준**: `can1357/oh-my-pi` · 커밋 `69e8c9e` (2026-10-03) · 버전 `18.5.1` — 전체 목록은 [VERSIONS.md](../VERSIONS.md)
 
 ## 개요
 Bun+TypeScript 모노레포 + Rust crates(~80k LoC) + Bazel. 주 초점 `packages/coding-agent/`. docs/ 100+ 파일이 authoritative.

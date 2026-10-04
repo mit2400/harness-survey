@@ -7,6 +7,9 @@
 | **대상 하니스** | opencode, oh-my-openagent(OmO, omo-native 포함), pi-mono, oh-my-pi, codex, claude-code, openclaw, hermes-agent |
 | **문서** | 29개 (하니스 8 + 토픽 21) |
 | **원본** | 55개 레포 정적 분석 — `repos/`에 클론(로컬 전용, git 제외) |
+| **분석 기준 버전** | [VERSIONS.md](VERSIONS.md) — 2026-10-05 수집, 커밋 고정 |
+
+> ⚠️ **버전 주의**: 8개 하니스 모두 주간/일간 릴리스라 수치가 빠르게 부패한다. 비교·확인 시 반드시 [VERSIONS.md](VERSIONS.md)의 커밋을 먼저 대조할 것.
 
 ## 구조
 

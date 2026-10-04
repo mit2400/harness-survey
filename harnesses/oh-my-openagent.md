@@ -2,9 +2,10 @@
 
 > OmO: Just type "mass ulw" keyword with your prompt. (`code-yeongyu/oh-my-openagent`, 69k stars)
 > omo-native는 이 레포 안의 어댑터 (`packages/omo-native/`)
+> **분석 기준**: `code-yeongyu/oh-my-openagent` · 커밋 `251cbfe` (2026-10-04) · 버전 `5.1.13` — 전체 목록은 [VERSIONS.md](../VERSIONS.md)
 
 ## 개요
-v5.0.0-beta.18, 45 패키지 모노레포. 20 Core + 4 MCP + 3 어댑터(OpenCode Ultimate/Codex Light/Senpi Native) + 12 플랫폼 런처. Bun 1.4.0, Rust crates(desktop computer-use).
+**50개 디렉터리** 모노레포(플랫폼 바이너리 12개 제외 시 38개). 구성: 공유 core 18개 + MCP 5개 + **어댑터 4개**(`omo-opencode`/`omo-codex`/`omo-senpi`/`omo-native`) + senpi-desktop 5개 + `senpi-task`·`boulder-state`·`rules-engine`·`lsp-daemon`·`shared-skills`·`utils`·`web`·`get-worker` + **플랫폼 바이너리 12개**(darwin/linux/windows × arm64/x64/x64-baseline/musl). Bun 1.4.0 + Rust crates(senpi-desktop computer-use).
 
 ## 디렉토리 구조
 ```
