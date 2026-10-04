@@ -22,6 +22,11 @@
 | [topics/orchestration.md](topics/orchestration.md) | 워크플로/오케스트레이션 비교 (계획 모드, 루프, DAG, 상태 관리) |
 | [topics/model-management.md](topics/model-management.md) | 모델/프로바이더 관리 비교 (카탈로그, fallback, effort, 캐시) |
 | [topics/shell-exec.md](topics/shell-exec.md) | 셸 실행 비교 (백엔드, 출력 제한, 백그라운드, persistent kernel) |
+| [topics/session-management.md](topics/session-management.md) | 세션 관리 비교 (저장 포맷, 트리/fork, resume/share, 격리) |
+| [topics/surfaces.md](topics/surfaces.md) | 실행/배포 표면 비교 (TUI, RPC/ACP/MCP 서버, IDE, 게이트웨이, 패키징) |
+| [topics/git-worktree.md](topics/git-worktree.md) | git 워크플로우·worktree 격리 비교 |
+| [topics/evaluation.md](topics/evaluation.md) | eval/테스트 인프라 비교 (eval 패키지, 플러그인 테스트, 스킬 검증, CI) |
+| [topics/security.md](topics/security.md) | 보안 비교 (시크릿 관리, 인젝션 방어, trust 모델, 관리자 정책) |
 | [topics/vision-computer-use.md](topics/vision-computer-use.md) | 비전/이미지 툴, 브라우저 자동화, computer use 비교 |
 | [topics/sandbox.md](topics/sandbox.md) | 샌드박스/격리/권한 승인 시스템 비교 |
 | [topics/lsp-lint.md](topics/lsp-lint.md) | LSP/린트/정적분석 지원 비교 (LSP 제공 형태, diagnostics, AST 검색) |
